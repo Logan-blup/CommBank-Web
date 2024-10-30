@@ -122,6 +122,65 @@ const Field = (props: FieldProps) => (
   </FieldContainer>
 )
 
+import { updateGoal as updateGoalApi } from '../../../api/lib'
+// ...
+
+export function GoalManager(props: Props) {
+  // ...
+
+  const pickEmojiOnClick = () => (emoji: BaseEmoji, event: MouseEvent) => {
+    // ...
+
+    const updatedGoal: Goal = {
+      ...props.goal,
+      icon: emoji.native ?? props.goal.icon,
+      name: name ?? props.goal.name,
+      targetDate: targetDate ?? props.goal.targetDate,
+      targetAmount: targetAmount ?? props.goal.targetAmount,
+    }
+
+    updateGoalApi(props.goal.id, updatedGoal)
+  }
+}
+public class GoalControllerTests
+{
+    private readonly FakeCollections collections;
+
+    public GoalControllerTests()
+    {
+        collections = new();
+    }
+
+    // ...
+
+    [Fact]
+    public async void GetForUser()
+    {
+        // Arrange
+        var goals = collections.GetGoals();
+        var users = collections.GetUsers();
+        IGoalsService goalsService = new FakeGoalsService(goals, goals[0]);
+        IUsersService usersService = new FakeUsersService(users, users[0]);
+        GoalController controller = new(goalsService, usersService);
+
+        // Act
+        var httpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext();
+        controller.ControllerContext.HttpContext = httpContext;
+        var result = await controller.GetForUser(goals[0].UserId!);
+
+        // Assert
+        Assert.NotNull(result);
+
+        var index = 0;
+        foreach (Goal goal in result!)
+        {
+            Assert.IsAssignableFrom<Goal>(goal);
+            Assert.Equal(goals[0].UserId, goal.UserId);
+            index++;
+        }
+    }
+}
+
 const GoalManagerContainer = styled.div`
   display: flex;
   flex-direction: column;
